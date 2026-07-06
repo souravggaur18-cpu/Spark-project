@@ -1,5 +1,5 @@
 # Use a base image with Java (required for Spark)
-FROM openjdk:11-jre-slim
+FROM eclipse temruin:11-jre
 
 # Install Python and pip
 RUN apt-get update && apt-get install -y \
