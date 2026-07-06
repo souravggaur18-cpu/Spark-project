@@ -1,22 +1,26 @@
 # Use a base image with Java (required for Spark)
 FROM eclipse-temurin:11-jre
 
-# Install Python and pip
+
+
+# Install Python, pip, and venv tools
 RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip \
+    python3-venv \
     wget \
     tar \
     gzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install PySpark
-RUN pip install pyspark
+# Create a virtual environment and put it in the PATH
+ENV VIRTUAL_ENV=/opt/venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-# Set environment variables for Spark
-ENV SPARK_VERSION=3.5.0
-ENV SPARK_HOME=/opt/spark
-ENV PATH="${PATH}:${SPARK_HOME}/bin"
+# Install PySpark inside the virtual environment
+RUN pip install --no-cache-dir pyspark
+
 
 # Download and extract Spark (Fixed the SPSPARK_VERSION typo here)
 RUN wget https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop3.tgz -O /tmp/spark.tgz \
@@ -35,3 +39,7 @@ COPY "tips (1).csv" .
 
 # Define the command to run the Spark application
 CMD ["spark-submit", "spark_app.py"]
+
+
+
+
